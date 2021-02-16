@@ -96,6 +96,21 @@ function PlayerSystem.joinUnion(oActor, unionActID)
 	log.Infof("player %s join union %s %s", pid, unionActID, suc and "succeed" or "failed")
 end
 
+function PlayerSystem.sendItem(oActor, receiver, itemID, count)
+	local pid = oActor:GetID():gsub("(%a+)(%d+)", "%2")
+	local model = getPlayer(pid)
+	if model.item[itemID] == nil then
+		model.item[itemID] = 0
+	end
+	if model.item[itemID] < count then
+		log.Infof("player %s shortage item %s(%s < %s) send to %s.", pid, itemID, model.item[itemID], count, receiver)
+		return
+	end
+	model.item[itemID] = model.item[itemID] - count
+	local err = oActor:send(receiver, "addItem", itemID, count)
+	assert(err == nil)
+end
+
 -- 测试入口函数
 function Test()
 	local sched = scheduler:new()
@@ -114,6 +129,7 @@ function Test()
 	-- 玩家101, 先加道具, 再申请加入工会
 	player101:echo("addItem", 20001, 15)
 	player101:echo("joinUnion", union1001:GetID())
+	player101:echo("sendItem", player102:GetID(), 20001, 3)
 	-- 玩家102, 先加道具, 再申请加入工会
 	player102:echo("addItem", 20001, 5)
 	player102:echo("joinUnion", union1001:GetID())
