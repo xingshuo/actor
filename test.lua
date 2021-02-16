@@ -109,6 +109,7 @@ function PlayerSystem.sendItem(oActor, receiver, itemID, count)
 	model.item[itemID] = model.item[itemID] - count
 	local err = oActor:send(receiver, "addItem", itemID, count)
 	assert(err == nil)
+	log.Infof("player %s send item %s %s to %s", pid, itemID, count, receiver)
 end
 
 -- 测试入口函数
@@ -129,6 +130,7 @@ function Test()
 	-- 玩家101, 先加道具, 再申请加入工会
 	player101:echo("addItem", 20001, 15)
 	player101:echo("joinUnion", union1001:GetID())
+	-- 赠送玩家102道具
 	player101:echo("sendItem", player102:GetID(), 20001, 3)
 	-- 玩家102, 先加道具, 再申请加入工会
 	player102:echo("addItem", 20001, 5)
